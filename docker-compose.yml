@@ -5,19 +5,6 @@ services:
       context: ./ms-auth-user
       dockerfile: Dockerfile
     image: ms-auth-user
-    ports:
-      - "8081:8081"
-    networks:
-      - spring-cloud-network
-  
-  ms-search-recipe:
-    container_name: ms-search-food
-    build:
-      context: ./ms-search-food
-      dockerfile: Dockerfile
-    image: ms-search-food
-    ports:
-      - "8080:8080"
     networks:
       - spring-cloud-network
 
