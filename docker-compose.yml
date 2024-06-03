@@ -1,13 +1,20 @@
+version: '3.9'
+
 services:
-  ms-auth-user:
-    container_name: ms-auth-user
+  ms-search-food:
     build:
-      context: ./ms-auth-user
+      context: ./ms-search-food
       dockerfile: Dockerfile
-    image: ms-auth-user
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     networks:
-      - spring-cloud-network
+      - my-network
 
 networks:
-  spring-cloud-network:
+  my-network:
     driver: bridge
+
+# docker-compose build --no-cache
+# docker-compose up
