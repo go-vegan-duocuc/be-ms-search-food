@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,12 +19,14 @@ import cl.govegan.mssearchfood.utils.responses.ResponseHttp;
 
 @RestController
 @RequestMapping("/api/v1/recipes")
+@CrossOrigin(origins = {"http://localhost:8100", "http://localhost:8080"})
 public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
 
     @GetMapping()
+    @CrossOrigin(origins = {"http://localhost:8100", "http://localhost:8080"})
     public ResponseEntity<ResponseHttp<Page<Recipe>>> findAllRecipes(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
