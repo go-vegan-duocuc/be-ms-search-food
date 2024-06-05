@@ -1,6 +1,5 @@
 package cl.govegan.mssearchfood.utils.requests.food;
 
-import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FoodRequest {
 
-   @Nonnull
    String name;
    String waterPercentage;
    String caloriesKcal;
