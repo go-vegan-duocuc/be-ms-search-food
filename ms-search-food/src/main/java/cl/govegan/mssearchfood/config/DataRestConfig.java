@@ -14,6 +14,7 @@ public class DataRestConfig implements RepositoryRestConfigurer {
             .allowedOrigins("http://localhost:8100", "http://localhost:8080")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
-            .allowCredentials(true);
+            .allowCredentials(true)
+            .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials");
     }
 }
