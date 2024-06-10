@@ -17,10 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import cl.govegan.mssearchfood.HATEOAS.FoodCategoryAssembler;
+import cl.govegan.mssearchfood.HATEOAS.FoodCategoryResource;
 import cl.govegan.mssearchfood.HATEOAS.FoodResource;
 import cl.govegan.mssearchfood.HATEOAS.FoodResourceAssembler;
 import cl.govegan.mssearchfood.exceptions.ResourceNotFoundException;
 import cl.govegan.mssearchfood.models.food.Food;
+import cl.govegan.mssearchfood.models.food.FoodCategory;
 import cl.govegan.mssearchfood.services.foodservices.FoodService;
 import cl.govegan.mssearchfood.utils.requests.food.FoodRequest;
 import cl.govegan.mssearchfood.utils.responses.ResponseHttp;
@@ -34,6 +37,9 @@ public class FoodController {
 
     @Autowired
     private FoodResourceAssembler assembler;
+
+    @Autowired
+    private FoodCategoryAssembler categoryAssembler;
 
     @GetMapping()
     public ResponseEntity<PagedModel<FoodResource>> findAllFoods(
@@ -90,7 +96,7 @@ public class FoodController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<ResponseHttp<?>> findAllCategories() {
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseHttp<>(200, "Categories retrived", foodService.findAllCategories()));
+    public ResponseEntity<FoodCategoryResource> findAllCategories() {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryAssembler.toModel(new FoodCategory()));
     }
 }
