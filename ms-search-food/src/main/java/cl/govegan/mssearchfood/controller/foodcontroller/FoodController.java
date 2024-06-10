@@ -1,12 +1,17 @@
 package cl.govegan.mssearchfood.controller.foodcontroller;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.PagedModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +28,6 @@ import cl.govegan.mssearchfood.HATEOAS.FoodResource;
 import cl.govegan.mssearchfood.HATEOAS.FoodResourceAssembler;
 import cl.govegan.mssearchfood.exceptions.ResourceNotFoundException;
 import cl.govegan.mssearchfood.models.food.Food;
-import cl.govegan.mssearchfood.models.food.FoodCategory;
 import cl.govegan.mssearchfood.services.foodservices.FoodService;
 import cl.govegan.mssearchfood.utils.requests.food.FoodRequest;
 import cl.govegan.mssearchfood.utils.responses.ResponseHttp;
@@ -96,7 +100,10 @@ public class FoodController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<FoodCategoryResource> findAllCategories() {
-        return ResponseEntity.status(HttpStatus.OK).body(categoryAssembler.toModel(new FoodCategory()));
+    public CollectionModel<FoodCategoryResource> findAllCategories() {
+
+        List<FoodCategoryResource> categoriesResources = foodService.findAllCategories().stream().map(categoryAssembler::toModel).collect(Collectors.toList());
+
+        return CollectionModel.of(categoriesResources, linkTo(methodOn(FoodController.class).findAllCategories()).withSelfRel());
     }
 }
