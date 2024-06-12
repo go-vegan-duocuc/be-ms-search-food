@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cl.govegan.mssearchfood.HATEOAS.RecipeResource;
 import cl.govegan.mssearchfood.HATEOAS.RecipeResourceAssembler;
-import cl.govegan.mssearchfood.exceptions.ResourceNotFoundException;
 import cl.govegan.mssearchfood.models.recipe.Recipe;
 import cl.govegan.mssearchfood.services.recipeservices.RecipeService;
 
@@ -40,7 +39,7 @@ public class RecipeController {
             PagedModel<RecipeResource> pagedModel = assembler.toPagedModel(recipesResult);
             return ResponseEntity.ok(pagedModel);
         } else {
-            throw new ResourceNotFoundException("No recipes found");
+            return ResponseEntity.noContent().build();
         }
     }
 
@@ -57,7 +56,7 @@ public class RecipeController {
             PagedModel<RecipeResource> pagedModel = assembler.toPagedModel(recipesResult);
             return ResponseEntity.ok(pagedModel);
         } else {
-            throw new ResourceNotFoundException("No recipes found");
+            return ResponseEntity.noContent().build();
         }
     }
 
@@ -68,7 +67,7 @@ public class RecipeController {
         if (recipe != null) {
             return ResponseEntity.ok(EntityModel.of(assembler.toModel(recipe)));
         } else {
-            throw new ResourceNotFoundException("No recipe found");
+            return ResponseEntity.noContent().build();
         }
     }
 }

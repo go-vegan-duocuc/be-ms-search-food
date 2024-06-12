@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.8'
 
 services:
   ms-search-food:
@@ -8,13 +8,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=dev
+    volumes:
+      - ./logs:/app/logs
     networks:
-      - my-network
+      - ms-search-food-network
 
 networks:
-  my-network:
+  ms-search-food-network:
     driver: bridge
-
-# docker-compose build --no-cache
-# docker-compose up

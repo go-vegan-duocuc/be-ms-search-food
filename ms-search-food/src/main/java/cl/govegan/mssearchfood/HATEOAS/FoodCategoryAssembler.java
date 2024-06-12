@@ -1,5 +1,8 @@
 package cl.govegan.mssearchfood.HATEOAS;
 
+import java.util.List;
+
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -27,6 +30,14 @@ public class FoodCategoryAssembler extends RepresentationModelAssemblerSupport<F
       resource.add(linkTo(methodOn(FoodController.class).findAllCategories()).withRel("foodCategories"));
       
       return resource;
+   }
+
+   public @NonNull CollectionModel<FoodCategoryResource> toCollectionModel(@NonNull List<FoodCategory> foodCategoriesList) {
+
+      CollectionModel<FoodCategoryResource> foodCategoriesResources = super.toCollectionModel(foodCategoriesList);
+      foodCategoriesResources.add(linkTo(methodOn(FoodController.class).findAllCategories()).withSelfRel());
+
+      return foodCategoriesResources;
    }
    
 }

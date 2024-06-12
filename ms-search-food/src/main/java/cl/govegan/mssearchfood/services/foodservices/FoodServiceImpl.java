@@ -46,6 +46,7 @@ public class FoodServiceImpl implements FoodService {
       foodRepository.deleteById(id);
    }
 
+   @Override
    public List<FoodCategory> findAllCategories() {
       return foodRepository.findAllCategories();
    }
