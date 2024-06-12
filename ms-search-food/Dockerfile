@@ -14,4 +14,4 @@ WORKDIR /app
 
 COPY --from=buildstage /ms-search-food/target/ms-search-food-0.0.1-SNAPSHOT.jar ms-search-food.jar
 
-ENTRYPOINT ["java", "-Dlogging.file.path=/app/logs", "-jar", "ms-search-food.jar"]
+ENTRYPOINT ["java", "-jar", "ms-search-food.jar"]
