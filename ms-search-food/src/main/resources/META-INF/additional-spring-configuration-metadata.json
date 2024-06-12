@@ -1,0 +1,21 @@
+{"properties": [{
+  "name": "spring.data.mongodb.socketTimeoutMS",
+  "type": "java.lang.String",
+  "description": "A description for 'spring.data.mongodb.socketTimeoutMS'"
+},
+{
+  "name": "spring.data.mongodb.connectTimeoutMS",
+  "type": "java.lang.String",
+  "description": "A description for 'spring.data.mongodb.connectTimeoutMS'"
+},
+{
+  "name": "spring.data.mongodb.writeConcern",
+  "type": "java.lang.String",
+  "description": "A description for 'spring.data.mongodb.writeConcern'"
+},
+{
+  "name": "spring.data.mongodb.retryWrites",
+  "type": "java.lang.String",
+  "description": "A description for 'spring.data.mongodb.retryWrites'"
+}
+]}
