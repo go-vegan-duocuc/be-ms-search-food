@@ -1,16 +1,16 @@
-version: '3.8'
+version: '3.9'
 
 services:
   ms-search-food:
     build:
       context: ./ms-search-food
       dockerfile: Dockerfile
+    volumes:
+      - /tmp
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/credentials.json
     ports:
       - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
-    volumes:
-      - ./logs:/app/logs
     networks:
       - ms-search-food-network
 
