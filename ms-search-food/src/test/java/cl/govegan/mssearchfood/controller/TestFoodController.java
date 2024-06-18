@@ -2,6 +2,7 @@ package cl.govegan.mssearchfood.controller;
 
 import cl.govegan.mssearchfood.model.food.Food;
 import cl.govegan.mssearchfood.service.foodservice.FoodService;
+import cl.govegan.mssearchfood.utils.page.Paginator;
 import cl.govegan.mssearchfood.web.response.ApiEntityResponse;
 import cl.govegan.mssearchfood.web.response.ApiPageResponse;
 import org.junit.jupiter.api.AfterEach;
@@ -11,20 +12,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 class TestFoodController {
 
     @Mock
@@ -56,8 +55,10 @@ class TestFoodController {
     @Test
     @DisplayName("Should return all foods")
     void getAllFoods () {
-        Page<Food> foodPage = new PageImpl<>(Collections.singletonList(new Food()));
-        when(foodService.findAllFoods(any())).thenReturn(foodPage);
+        // Create a non-null Food object
+        Food food = mock(Food.class);
+        Page<Food> foodPage = new PageImpl<>(Collections.singletonList(food));
+        when(foodService.findAllFoods(Paginator.getPageable(0, 10))).thenReturn(foodPage);
 
         ResponseEntity<ApiPageResponse<Food>> response = foodController.getAllFoods(0, 10);
 
@@ -78,14 +79,28 @@ class TestFoodController {
     }
 
     @Test
-    @DisplayName("Should return food by id")
-    void getFoodById () {
-        when(foodService.findById(anyString())).thenReturn(java.util.Optional.of(new Food()));
+    @DisplayName("Should return food by id when food exists")
+    void getFoodById_WhenFoodExists () {
+        Food food = mock(Food.class);
+        when(foodService.findById("1")).thenReturn(Optional.of(food));
 
         ResponseEntity<ApiEntityResponse<Food>> response = foodController.getFoodById("1");
 
         assertEquals(200, response.getStatusCode().value());
-        verify(foodService, times(1)).findById(anyString());
+        assertEquals(food, response.getBody().getData());
+        verify(foodService, times(1)).findById("1");
+    }
+
+    @Test
+    @DisplayName("Should return not found when food does not exist")
+    void getFoodById_WhenFoodDoesNotExist () {
+        when(foodService.findById("1")).thenReturn(Optional.empty());
+
+        ResponseEntity<ApiEntityResponse<Food>> response = foodController.getFoodById("1");
+
+        assertEquals(404, response.getStatusCode().value());
+        assertNull(response.getBody().getData());
+        verify(foodService, times(1)).findById("1");
     }
 
     @Test

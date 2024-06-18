@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecipeData {
-   private String difficulty;
-   private String yield;
-   private String preparationTime;
-   private String cookingTime;
+    private String difficulty;
+    private String yields;
+    private String preparationTime;
+    private String cookingTime;
 }
