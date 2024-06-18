@@ -14,9 +14,6 @@ public interface RecipeRepository extends MongoRepository<Recipe, String> {
     @NonNull
     Page<Recipe> findAll (@NonNull Pageable pageable);
 
-    @Query("{ 'title' : { $regex: ?0, $options: 'i' } }")
-    Page<Recipe> findByTitleContaining (@NonNull String query, @NonNull Pageable pageable);
-
     Page<Recipe> findByTitleNormalizedContaining (@NonNull String query, @NonNull Pageable pageable);
 
     @Override

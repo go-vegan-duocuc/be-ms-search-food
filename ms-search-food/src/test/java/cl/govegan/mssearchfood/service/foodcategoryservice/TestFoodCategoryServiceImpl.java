@@ -65,7 +65,9 @@ class TestFoodCategoryServiceImpl {
         FoodCategory foodCategory = new FoodCategory();
         when(foodCategoryRepository.findById(anyString())).thenReturn(Optional.of(foodCategory));
 
-        assertEquals(foodCategory, foodCategoryService.findById("1").get());
+        Optional<FoodCategory> optionalFoodCategory = foodCategoryService.findById("1");
+        assertTrue(optionalFoodCategory.isPresent());
+        assertEquals(foodCategory, optionalFoodCategory.get());
 
         verify(foodCategoryRepository, times(1)).findById(anyString());
     }
@@ -83,10 +85,13 @@ class TestFoodCategoryServiceImpl {
     @Test
     @DisplayName("Should return food category by code")
     void shouldReturnFoodCategoryByCode () {
-        FoodCategory foodCategory = new FoodCategory();
+        FoodCategory foodCategory = FoodCategory.builder().categoryName("Food").categoryCode(1).build();
         when(foodCategoryRepository.findByCategoryCode(anyInt())).thenReturn(Optional.of(foodCategory));
 
-        assertEquals(foodCategory, foodCategoryService.findByCode(1).get());
+        Optional<FoodCategory> optionalFoodCategory = foodCategoryService.findByCode(1);
+
+        assertTrue(optionalFoodCategory.isPresent());
+        assertEquals(foodCategory, optionalFoodCategory.get());
 
         verify(foodCategoryRepository, times(1)).findByCategoryCode(anyInt());
     }

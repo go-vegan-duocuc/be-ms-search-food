@@ -94,7 +94,10 @@ class TestFoodServiceImpl {
         Food food = new Food();
         when(foodRepository.findById(anyString())).thenReturn(Optional.of(food));
 
-        assertEquals(food, foodService.findById("1").get());
+        Optional<Food> optionalFood = foodService.findById("1");
+
+        assertTrue(optionalFood.isPresent());
+        assertEquals(food, optionalFood.get());
 
         verify(foodRepository, times(1)).findById(anyString());
     }

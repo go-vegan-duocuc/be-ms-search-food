@@ -1,19 +1,14 @@
 package cl.govegan.mssearchfood.exception;
 
-import cl.govegan.mssearchfood.service.recipeservice.RecipeService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TestExceptions {
-
-    @Mock
-    private RecipeService mockRecipeService;
 
     private AutoCloseable closeable;
 
