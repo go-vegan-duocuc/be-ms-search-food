@@ -84,7 +84,10 @@ class TestRecipeServiceImpl {
         Recipe recipe = new Recipe();
         when(recipeRepository.findById(anyString())).thenReturn(Optional.of(recipe));
 
-        assertEquals(recipe, recipeService.findById("1").get());
+        Optional<Recipe> optionalRecipe = recipeService.findById("1");
+
+        assertTrue(optionalRecipe.isPresent());
+        assertEquals(recipe, optionalRecipe.get());
 
         verify(recipeRepository, times(1)).findById(anyString());
     }
