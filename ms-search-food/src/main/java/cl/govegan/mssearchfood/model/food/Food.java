@@ -1,18 +1,21 @@
 package cl.govegan.mssearchfood.model.food;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import cl.govegan.mssearchfood.model.foodcategory.FoodCategory;
+import cl.govegan.mssearchfood.utils.jsonutils.IgnoreDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @AllArgsConstructor
 @Builder
 @RequiredArgsConstructor
-@Document(collection = "foods")
+@Document(collection = "foods_v2")
 public class Food {
     @Id
     private String id;
@@ -44,6 +47,11 @@ public class Food {
     private double folicAcidMcg;
     private double folateEquivFDMcg;
     private double edibleFractionPercentage;
-    private String categoryId;
-    private String categoryName;
+
+    @JsonDeserialize(using = IgnoreDeserializer.class)
+    private String nameNormalized;
+
+    @DBRef
+    @JsonDeserialize(using = IgnoreDeserializer.class)
+    private FoodCategory category;
 }

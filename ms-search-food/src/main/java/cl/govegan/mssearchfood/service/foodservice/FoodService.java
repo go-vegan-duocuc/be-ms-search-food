@@ -1,26 +1,28 @@
 package cl.govegan.mssearchfood.service.foodservice;
 
-import java.util.List;
-import java.util.Optional;
-
+import cl.govegan.mssearchfood.model.food.Food;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import cl.govegan.mssearchfood.model.food.Food;
-import cl.govegan.mssearchfood.web.request.foodrequest.FoodRequest;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public interface FoodService {
 
-   public List<Food> findAll();
+    Page<Food> findAllFoods (Pageable pageable);
 
-   public List<Food> findByNameContaining(String query);
+    Page<Food> findAllFoodsBySearch (String query, Pageable pageable);
 
-   public Optional<Food> findById(String id);
+    Optional<Food> findById (String id);
 
-   public Food saveFood (FoodRequest foodRequest);
+    Food saveFood (Map<String, String> body);
 
-   public Food updateFood (FoodRequest foodRequest);
+    Food updateFood (Map<String, String> body);
 
-   public void deleteById(String id);
-    
+    void deleteById (String id);
+
+    Page<Food> findAllFoodsByCategory (String categoryId, Pageable pageable);
+
 }

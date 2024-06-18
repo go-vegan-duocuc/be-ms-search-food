@@ -1,25 +1,20 @@
 package cl.govegan.mssearchfood.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import cl.govegan.mssearchfood.model.food.Food;
 import cl.govegan.mssearchfood.service.foodservice.FoodService;
-import cl.govegan.mssearchfood.utils.custompage.PaginationUtils;
+import cl.govegan.mssearchfood.utils.message.ErrorMessage;
+import cl.govegan.mssearchfood.utils.message.SuccessMessage;
+import cl.govegan.mssearchfood.utils.page.Paginator;
+import cl.govegan.mssearchfood.utils.request.Normalization;
 import cl.govegan.mssearchfood.utils.response.ResponseBuilder;
-import cl.govegan.mssearchfood.web.request.foodrequest.FoodRequest;
+import cl.govegan.mssearchfood.web.response.ApiEntityResponse;
+import cl.govegan.mssearchfood.web.response.ApiPageResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/foods")
@@ -28,53 +23,85 @@ public class FoodController {
 
     private final FoodService foodService;
 
+    @GetMapping("/status")
+    public ResponseEntity<String> getStatus () {
+        return ResponseEntity.ok("OK");
+    }
+
     @GetMapping()
-    public ResponseEntity<ResponseBuilder<Page<Food>>> findAllFoods(
+    public ResponseEntity<ApiPageResponse<Food>> getAllFoods (
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        List<Food> foodsResult = foodService.findAll();
+        Page<Food> foodsResult = foodService.findAllFoods(Paginator.getPageable(page, size));
 
-        return ResponseBuilder.buildResponse("All foods found", "No data found", PaginationUtils.createCustomPage(foodsResult, page, size));
+        return ResponseBuilder.buildPageResponse((!foodsResult.isEmpty()) ?
+                        SuccessMessage.DATA_FOUND
+                        : ErrorMessage.DATA_NOT_FOUND,
+                foodsResult);
     }
 
-    @GetMapping("/findBySearch")
-    public ResponseEntity<ResponseBuilder<Page<Food>>> findBySearch(
-            @RequestParam String search,
+    @GetMapping("/search")
+    public ResponseEntity<ApiPageResponse<Food>> getAllFoodsBySearch (
+            @RequestParam String name,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        List<Food> foodsResult = foodService.findByNameContaining(search);
+        Page<Food> foodsResult = foodService.findAllFoodsBySearch(Normalization.normalizeText(name), Paginator.getPageable(page, size));
 
-        return ResponseBuilder.buildResponse("Food found by search: " + search + ".", "No data found by search: " + search + ".",PaginationUtils.createCustomPage(foodsResult, page, size));
+        return ResponseBuilder.buildPageResponse((!foodsResult.isEmpty()) ?
+                        SuccessMessage.DATA_FOUND_BY_SEARCH + name
+                        : ErrorMessage.DATA_NOT_FOUND,
+                foodsResult);
     }
 
-    @GetMapping("/findById")
-    public ResponseEntity<ResponseBuilder<Food>> findFoodById(@RequestParam String id) {
-        Optional<Food> foodResult = foodService.findById(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiEntityResponse<Food>> getFoodById (@PathVariable String id) {
 
-        return ResponseBuilder.buildResponse("Food found by ID: " + id + ".", "No data found by ID: "+ id + ".", foodResult);
+        Food foodResult = foodService.findById(id).orElse(null);
+
+        return ResponseBuilder.buildEntityResponse((foodResult != null) ?
+                        SuccessMessage.DATA_FOUND_BY_ID + id
+                        : ErrorMessage.DATA_NOT_FOUND_BY_ID,
+                foodResult);
     }
 
     @PostMapping()
-    public ResponseEntity<ResponseBuilder<Food>> saveFood(@RequestBody FoodRequest foodRequest) {
-        Food savedFood = foodService.saveFood(foodRequest);
+    public ResponseEntity<ApiEntityResponse<Food>> postFood (@RequestBody Map<String, String> body) {
 
-        return ResponseBuilder.buildResponse("Food saved successfully", "Error saving food", savedFood);
+        Food savedFood = foodService.saveFood(body);
+
+        return ResponseBuilder.buildEntityResponse(SuccessMessage.DATA_SAVED, savedFood);
     }
 
     @PatchMapping()
-    public ResponseEntity<ResponseBuilder<Food>> updateFood(@RequestBody FoodRequest foodRequest) {
-        Food updatedFood = foodService.updateFood(foodRequest);
+    public ResponseEntity<ApiEntityResponse<Food>> patchFood (@RequestBody Map<String, String> body) {
 
-        return ResponseBuilder.buildResponse("Food updated successfully", "Error updating food", updatedFood);
+        Food updatedFood = foodService.updateFood(body);
+
+        return ResponseBuilder.buildEntityResponse(SuccessMessage.DATA_UPDATED, updatedFood);
     }
 
-    @DeleteMapping()
-    public ResponseEntity<ResponseBuilder<String>> deleteFood(@RequestParam String id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiEntityResponse<String>> deleteFood (@PathVariable String id) {
+
         foodService.deleteById(id);
 
-        return ResponseBuilder.buildResponse("Food deleted successfully", "Error deleting food", id);
+        return ResponseBuilder.buildEntityResponse(SuccessMessage.DATA_DELETED, id);
+    }
+
+    @GetMapping("/category/{id}")
+    public ResponseEntity<ApiPageResponse<Food>> getAllFoodsByCategory (
+            @PathVariable String id,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        Page<Food> foodsResult = foodService.findAllFoodsByCategory(id, Paginator.getPageable(page, size));
+
+        return ResponseBuilder.buildPageResponse((!foodsResult.isEmpty()) ?
+                        SuccessMessage.DATA_FOUND + id
+                        : ErrorMessage.DATA_NOT_FOUND_BY_ID + id,
+                foodsResult);
     }
 
 }

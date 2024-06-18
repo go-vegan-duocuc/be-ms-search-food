@@ -1,67 +1,109 @@
 package cl.govegan.mssearchfood.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import cl.govegan.mssearchfood.model.recipe.Recipe;
 import cl.govegan.mssearchfood.service.recipeservice.RecipeService;
+import cl.govegan.mssearchfood.utils.message.ErrorMessage;
+import cl.govegan.mssearchfood.utils.message.SuccessMessage;
+import cl.govegan.mssearchfood.utils.page.Paginator;
+import cl.govegan.mssearchfood.utils.request.Normalization;
 import cl.govegan.mssearchfood.utils.response.ResponseBuilder;
+import cl.govegan.mssearchfood.web.response.ApiEntityResponse;
+import cl.govegan.mssearchfood.web.response.ApiPageResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/recipes")
+@RequiredArgsConstructor
 public class RecipeController {
 
-    @Autowired
-    private RecipeService recipeService;
+    private final RecipeService recipeService;
+
+    @GetMapping("/status")
+    public ResponseEntity<String> getStatus () {
+        return ResponseEntity.ok("OK");
+    }
 
     @GetMapping()
-    public ResponseEntity<ResponseBuilder<Page<Recipe>>> findAllRecipes(
+    public ResponseEntity<ApiPageResponse<Recipe>> getAllRecipes (
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Recipe> recipesResult = recipeService.findAll(pageable);
+        Page<Recipe> recipesResult = recipeService.findAllRecipes(Paginator.getPageable(page, size));
 
-        if (recipesResult.hasContent()) {
-            return ResponseEntity.ok(new ResponseBuilder<>(200, "Recipes found", recipesResult));
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        return ResponseBuilder.buildPageResponse((!recipesResult.isEmpty()) ?
+                        SuccessMessage.DATA_FOUND
+                        : ErrorMessage.DATA_NOT_FOUND,
+                recipesResult);
     }
 
-    @GetMapping("/findBySearch")
-    public ResponseEntity<ResponseBuilder<Page<Recipe>>> searchRecipeByText(
-            @RequestParam String search,
+    @GetMapping("/search")
+    public ResponseEntity<ApiPageResponse<Recipe>> getAllFoodsBySearch (
+            @RequestParam String query,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Recipe> recipesResult = recipeService.findByTitleContaining(search, pageable);
+        Page<Recipe> recipesResult = recipeService.findAllRecipesBySearch(
+                Normalization.normalizeText(query), Paginator.getPageable(page, size));
 
-        if (recipesResult.hasContent()) {
-            return ResponseEntity.ok(new ResponseBuilder<>(200, "Recipes found", recipesResult));
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        return ResponseBuilder.buildPageResponse((!recipesResult.isEmpty()) ?
+                        SuccessMessage.DATA_FOUND_BY_SEARCH + query
+                        : ErrorMessage.DATA_NOT_FOUND,
+                recipesResult);
     }
 
-    @GetMapping("/findById")
-    public ResponseEntity<ResponseBuilder<Recipe>> findRecipeById(@RequestParam String recipeId) {
-        Recipe recipe = recipeService.findById(recipeId);
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiEntityResponse<Recipe>> getRecipeById (@PathVariable String id) {
 
-        if (recipe != null) {
-            return ResponseEntity.ok(new ResponseBuilder<>(200, "Recipe found", recipe));
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        Recipe recipe = recipeService.findById(id).orElse(null);
 
-        
+        return ResponseBuilder.buildEntityResponse((recipe != null) ?
+                        SuccessMessage.DATA_FOUND_BY_ID + id
+                        : ErrorMessage.DATA_NOT_FOUND_BY_ID,
+                recipe);
     }
+
+    @GetMapping("/special-needs")
+    public ResponseEntity<ApiPageResponse<Recipe>> getRecipesBySpecialNeed (
+            @RequestBody Map<String, String> body,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        String specialNeed = body.get("specialNeed");
+        Page<Recipe> recipesResult = recipeService.findAllRecipesBySpecialNeeds(specialNeed, Paginator.getPageable(page, size));
+
+        return ResponseBuilder.buildPageResponse((!recipesResult.isEmpty()) ?
+                        SuccessMessage.DATA_FOUND_BY_SEARCH + specialNeed
+                        : ErrorMessage.DATA_NOT_FOUND_BY_SEARCH + specialNeed,
+                recipesResult);
+    }
+
+    @PostMapping()
+    public ResponseEntity<ApiEntityResponse<Recipe>> saveRecipe (@RequestBody Map<String, Object> body) {
+
+        Recipe savedRecipe = recipeService.saveRecipe(body);
+
+        return ResponseBuilder.buildEntityResponse(SuccessMessage.DATA_SAVED, savedRecipe);
+    }
+
+    @PatchMapping()
+    public ResponseEntity<ApiEntityResponse<Recipe>> updateRecipe (@RequestBody Map<String, Object> body) {
+
+        Recipe updatedRecipe = recipeService.updateRecipe(body);
+
+        return ResponseBuilder.buildEntityResponse(SuccessMessage.DATA_UPDATED, updatedRecipe);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiEntityResponse<String>> deleteRecipe (@PathVariable String id) {
+
+        recipeService.deleteById(id);
+
+        return ResponseBuilder.buildEntityResponse(SuccessMessage.DATA_DELETED, id);
+    }
+
 }
