@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Builder
 @RequiredArgsConstructor
-@Document(collection = "foods_v2")
+@Document(collection = "foods")
 public class Food {
     @Id
     private String id;
