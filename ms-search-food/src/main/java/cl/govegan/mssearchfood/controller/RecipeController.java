@@ -67,7 +67,7 @@ public class RecipeController {
                 recipe);
     }
 
-    @GetMapping("/special-needs")
+    @PostMapping ("/special-needs")
     public ResponseEntity<ApiPageResponse<Recipe>> getRecipesBySpecialNeed (
             @RequestBody Map<String, String> body,
             @RequestParam(value = "page", defaultValue = "0") int page,

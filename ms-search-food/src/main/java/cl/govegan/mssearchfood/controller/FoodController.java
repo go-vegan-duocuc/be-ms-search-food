@@ -99,7 +99,7 @@ public class FoodController {
         Page<Food> foodsResult = foodService.findAllFoodsByCategory(id, Paginator.getPageable(page, size));
 
         return ResponseBuilder.buildPageResponse((!foodsResult.isEmpty()) ?
-                        SuccessMessage.DATA_FOUND + id
+                        SuccessMessage.DATA_FOUND_BY_ID + id
                         : ErrorMessage.DATA_NOT_FOUND_BY_ID + id,
                 foodsResult);
     }
