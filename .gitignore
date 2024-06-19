@@ -8,7 +8,6 @@ out/
 !**/src/test/**/target/
 HELP.md
 
-
 # Excluir archivos y carpetas de IDEs
 .idea/
 .vscode/
@@ -40,17 +39,9 @@ Thumbs.db
 
 ### STS ###
 .apt_generated
-.classpath
-.factorypath
-.project
-.settings
 .springBeans
 .sts4-cache
 
 ### IntelliJ IDEA ###
 ../.idea
 ../.vscode
-.idea
-*.iws
-*.iml
-*.ipr
