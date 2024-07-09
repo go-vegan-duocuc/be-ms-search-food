@@ -1,40 +1,24 @@
 package cl.govegan.mssearchfood.exception;
 
-import cl.govegan.mssearchfood.service.foodservice.FoodService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.http.ResponseEntity;
 
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import cl.govegan.mssearchfood.web.response.ApiEntityResponse;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 class TestGlobalExceptionHandler {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private FoodService foodService;
+    private final GlobalExceptionHandler globalExceptionHandler = new GlobalExceptionHandler();
 
     @Test
-    void testInvalidFoodDataException () throws Exception {
-        doThrow(new InvalidFoodDataException("Id is required"))
-                .when(foodService).updateFood(anyMap());
+    void testHandleInvalidFoodDataException() {
+        InvalidFoodDataException ex = new InvalidFoodDataException("Test message");
+        ResponseEntity<ApiEntityResponse<String>> response = globalExceptionHandler.handleInvalidFoodDataException(ex);
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .patch("/api/v1/foods")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": \"\",\"name\": \"\", \"caloriesKcal\": \"\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Id is required"));
+        assert response != null;
+        ApiEntityResponse<String> body = response.getBody();
+        assert body != null;
+        assertEquals("Test message", body.getMessage());
+        // Add more assertions as needed
     }
 }

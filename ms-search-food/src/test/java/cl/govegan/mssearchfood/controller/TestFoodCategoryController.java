@@ -1,23 +1,29 @@
 package cl.govegan.mssearchfood.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
+
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+
 import cl.govegan.mssearchfood.model.foodcategory.FoodCategory;
 import cl.govegan.mssearchfood.service.foodcategoryservice.FoodCategoryService;
 import cl.govegan.mssearchfood.web.response.ApiEntityResponse;
 import cl.govegan.mssearchfood.web.response.ApiListResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
-
-import java.util.Collections;
-import java.util.HashMap;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 class TestFoodCategoryController {
 
@@ -124,4 +130,55 @@ class TestFoodCategoryController {
         verify(foodCategoryService, times(1)).delete(anyString());
     }
 
+    @Test
+    @DisplayName("Should return food category by invalid id")
+    void getFoodCategoryByInvalidId () {
+        when(foodCategoryService.findById(anyString())).thenReturn(java.util.Optional.empty());
+
+        ResponseEntity<ApiEntityResponse<FoodCategory>> response = foodCategoryController.getFoodCategoryById("invalid");
+
+        assertEquals(404, response.getStatusCode().value());
+        verify(foodCategoryService, times(1)).findById(anyString());
+    }
+
+    @Test
+    @DisplayName("Should return food category by invalid code")
+    void getFoodCategoryByInvalidCode () {
+        when(foodCategoryService.findByCode(anyInt())).thenReturn(java.util.Optional.empty());
+
+        ResponseEntity<ApiEntityResponse<FoodCategory>> response = foodCategoryController.getFoodCategoryByCode(999);
+
+        assertEquals(404, response.getStatusCode().value());
+        verify(foodCategoryService, times(1)).findByCode(anyInt());
+    }
+
+    @Test
+    @DisplayName("Debería manejar la excepción al obtener la categoría de alimentos por id")
+    void getFoodCategoryByIdException () {
+        when(foodCategoryService.findById(anyString())).thenThrow(new java.lang.RuntimeException("Exception"));
+
+        try {
+            foodCategoryController.getFoodCategoryById("1");
+        } catch (java.lang.RuntimeException e) {
+            assertEquals("Exception", e.getMessage());
+        }
+
+        verify(foodCategoryService, times(1)).findById(anyString());
+    }
+
+    @Test
+    @DisplayName("Debería manejar la excepción al obtener la categoría de alimentos por código")
+    void getFoodCategoryByCodeException () {
+        when(foodCategoryService.findByCode(anyInt())).thenThrow(new java.lang.RuntimeException("Exception"));
+
+        try {
+            foodCategoryController.getFoodCategoryByCode(1);
+        } catch (java.lang.RuntimeException e) {
+            assertEquals("Exception", e.getMessage());
+        }
+
+        verify(foodCategoryService, times(1)).findByCode(anyInt());
+    }
+
 }
+

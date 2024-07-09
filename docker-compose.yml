@@ -9,11 +9,12 @@ services:
     volumes:
       - /tmp
     environment:
-      #      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
       - MONGO_USER=${MONGO_USER}
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_DATABASE=${MONGO_DATABASE}
+    env_file:
+      - path: .env
     ports:
       - "8080:8080"
     networks:
