@@ -8,8 +8,6 @@ COPY src ./src
 
 RUN mvn clean package
 
-RUN mvn -D"sonar.projectKey=ms-search-food-branch" -D"sonar.projectName=ms-search-food-branch" -D"sonar.login=sqa_5343de562a0b0b16289a0c81b75d70a2202a2ae5" verify sonar:sonar
-
 FROM eclipse-temurin:17 AS runstage
 
 WORKDIR /app
